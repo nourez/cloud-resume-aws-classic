@@ -5,6 +5,7 @@ import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
+
 interface StatelessStackProps extends cdk.StackProps {
   readonly certificate?: acm.Certificate;
   readonly isProduction: boolean;
@@ -14,13 +15,15 @@ export class StatelessStack extends cdk.Stack {
     super(scope, id, props);
 
     const { certificate, isProduction } = props;
+
     // Create a S3 bucket to host the static website
     const CloudResumeBucket = new s3.Bucket(this, "CloudResumeBucket", {
+      bucketName: "nourez-dev",
       publicReadAccess: true,
       autoDeleteObjects: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       websiteIndexDocument: "index.html",
-      websiteErrorDocument: "404.html",
+      websiteErrorDocument: "error.html",
     });
 
     // Deploy the static website content to the S3 bucket
