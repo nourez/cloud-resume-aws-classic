@@ -3,6 +3,7 @@ import "source-map-support/register";
 import * as cdk from "aws-cdk-lib";
 import { StatelessStack } from "../lib/stateless-stack";
 import { CertStack } from "../lib/cert-stack";
+import { StatefulStack } from "../lib/stateful-stack";
 
 const app = new cdk.App();
 const isProd = process.env.CDK_DEFAULT_ACCOUNT === "REDACTED";
@@ -25,4 +26,11 @@ new StatelessStack(app, "StatelessStack", {
   certificate: certStack?.cert,
   crossRegionReferences: true,
   isProduction: isProd,
+});
+
+new StatefulStack(app, "StatefulStack", {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
 });
