@@ -19,9 +19,7 @@ describe("S3 Bucket", () => {
   const template = Template.fromStack(stack);
 
   it("is created", () => {
-    template.hasResourceProperties("AWS::S3::Bucket", {
-      BucketName: "nourez-dev",
-    });
+    template.hasResourceProperties("AWS::S3::Bucket", {});
 
     template.resourceCountIs("AWS::S3::Bucket", 1);
   });
