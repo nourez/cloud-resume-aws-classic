@@ -5,6 +5,9 @@ import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import * as acm from "aws-cdk-lib/aws-certificatemanager";
+import * as iam from "aws-cdk-lib/aws-iam";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as path from "path";
 
 interface StatelessStackProps extends cdk.StackProps {
   readonly certificate?: acm.Certificate;
@@ -38,7 +41,6 @@ export class StatelessStack extends cdk.Stack {
 
     // if a certificate is provided, create a CloudFront distribution using custom domain
     // otherwise, create a CloudFront distribution default domain
-
     const CloudResumeDistribution = isProduction
       ? new cloudfront.Distribution(this, "CloudResumeDistribution", {
           defaultBehavior: {
@@ -60,6 +62,28 @@ export class StatelessStack extends cdk.Stack {
     // Output the CloudFront distribution URL
     new cdk.CfnOutput(this, "CloudResumeDistributionURL", {
       value: CloudResumeDistribution.distributionDomainName,
+    });
+
+    // Create a role for the Lambda to access DynamoDB and write CloudWatch logs
+    const CloudResumeLambdaRole = new iam.Role(this, "CloudResumeLambdaRole", {
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+    });
+
+    // Give the Lambda role permission to DynamoDB
+    CloudResumeLambdaRole.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonDynamoDBFullAccess")
+    );
+
+    //Give the Lambda role permission to write CloudWatch logs
+    CloudResumeLambdaRole.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName("CloudWatchLogsFullAccess")
+    );
+
+    const CloudResumeLambda = new lambda.Function(this, "CloudResumeLambda", {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: "index.lambda_handler",
+      code: lambda.Code.fromAsset(path.join(__dirname, "../../api")),
+      role: CloudResumeLambdaRole,
     });
   }
 }
