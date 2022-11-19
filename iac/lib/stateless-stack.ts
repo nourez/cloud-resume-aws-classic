@@ -22,23 +22,13 @@ export class StatelessStack extends cdk.Stack {
 
     // Create a S3 bucket to host the static website
     const CloudResumeBucket = new s3.Bucket(this, "CloudResumeBucket", {
-      bucketName: "nourez-dev",
+      //bucketName: "nourez-dev",
       publicReadAccess: true,
       autoDeleteObjects: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       websiteIndexDocument: "index.html",
       websiteErrorDocument: "error.html",
     });
-
-    // Deploy the static website content to the S3 bucket
-    const CloudResumeDeployment = new s3deploy.BucketDeployment(
-      this,
-      "CloudResumeBucketDeployment",
-      {
-        sources: [s3deploy.Source.asset("../frontend")],
-        destinationBucket: CloudResumeBucket,
-      }
-    );
 
     // if a certificate is provided, create a CloudFront distribution using custom domain
     // otherwise, create a CloudFront distribution default domain
@@ -64,6 +54,17 @@ export class StatelessStack extends cdk.Stack {
     new cdk.CfnOutput(this, "CloudResumeDistributionURL", {
       value: CloudResumeDistribution.distributionDomainName,
     });
+
+    // Deploy the static website content to the S3 bucket
+    const CloudResumeDeployment = new s3deploy.BucketDeployment(
+      this,
+      "CloudResumeBucketDeployment",
+      {
+        sources: [s3deploy.Source.asset("../frontend")],
+        destinationBucket: CloudResumeBucket,
+        distribution: CloudResumeDistribution,
+      }
+    );
 
     // Create a role for the Lambda to access DynamoDB and write CloudWatch logs
     const CloudResumeLambdaRole = new iam.Role(this, "CloudResumeLambdaRole", {
