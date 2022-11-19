@@ -8,6 +8,7 @@ import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as path from "path";
+import * as apigateway from "aws-cdk-lib/aws-apigateway";
 
 interface StatelessStackProps extends cdk.StackProps {
   readonly certificate?: acm.Certificate;
@@ -81,9 +82,31 @@ export class StatelessStack extends cdk.Stack {
 
     const CloudResumeLambda = new lambda.Function(this, "CloudResumeLambda", {
       runtime: lambda.Runtime.PYTHON_3_9,
-      handler: "index.lambda_handler",
+      handler: "lambda_function.lambda_handler",
       code: lambda.Code.fromAsset(path.join(__dirname, "../../api")),
       role: CloudResumeLambdaRole,
+    });
+
+    // Create an API Gateway REST API
+    const CloudResumeAPI = new apigateway.LambdaRestApi(
+      this,
+      "CloudResumeAPI",
+      {
+        handler: CloudResumeLambda,
+        proxy: false,
+      }
+    );
+
+    const page = CloudResumeAPI.root.addResource("page");
+    page.addMethod("GET");
+    page.addMethod("PUT");
+
+    const pages = CloudResumeAPI.root.addResource("pages");
+    pages.addMethod("GET");
+
+    // Output the API Gateway URL
+    new cdk.CfnOutput(this, "CloudResumeAPIURL", {
+      value: CloudResumeAPI.url,
     });
   }
 }

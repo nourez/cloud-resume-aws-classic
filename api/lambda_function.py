@@ -11,7 +11,7 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(DYNAMO_TABLE)
 
 get_method = "GET"
-post_method = "POST"
+put_method = "PUT"
 page_path = "/page"
 pages_path = "/pages"
 
@@ -25,7 +25,7 @@ def lambda_handler(event, context):
         if http_method == get_method:
             response = get_hit_count(event["queryStringParameters"]["page"])
             return response
-        elif http_method == post_method:
+        elif http_method == put_method:
             response = increment_hit_count(event["queryStringParameters"]["page"])
             return response
         else:
@@ -40,6 +40,7 @@ def lambda_handler(event, context):
         return response_builder(404)
 
 
+# CRUD Methods
 def get_hit_count(page):
     try:
         hits = table.get_item(Key={"page": page})
@@ -54,15 +55,25 @@ def get_hit_count(page):
 
 def increment_hit_count(page):
     try:
-        table.update_item(
-            Key={"page": page},
-            UpdateExpression="set hits = hits + :val",
-            ExpressionAttributeValues={":val": 1},
-            ReturnValues="UPDATED_NEW",
-        )
+        if not page_exists(page):
+            table.put_item(Item={"page": page, "hits": 1})
+        else:
+            table.update_item(
+                Key={"page": page},
+                UpdateExpression="set hits = hits + :val",
+                ExpressionAttributeValues={":val": 1},
+                ReturnValues="UPDATED_NEW",
+            )
 
+        hits = table.get_item(Key={"page": page})
         response = response_builder(
-            200, {"Action": "Increment", "Status": "Success", "Page": page}
+            200,
+            {
+                "Action": "Increment",
+                "Status": "Success",
+                "Page": page,
+                "hits": hits["Item"]["hits"],
+            },
         )
 
     except Exception as exception:
@@ -92,6 +103,7 @@ def get_pages():
     return response
 
 
+# Helper Methods
 def response_builder(status_code, body=None):
     response = {
         "statusCode": status_code,
@@ -105,3 +117,16 @@ def response_builder(status_code, body=None):
         response["body"] = json.dumps(body, cls=CustomEncoder)
 
     return response
+
+
+def page_exists(page):
+    try:
+        hits = table.get_item(Key={"page": page})
+        if "Item" in hits:
+            return True
+        else:
+            return False
+
+    except Exception as exception:
+        print(exception)
+        return False
