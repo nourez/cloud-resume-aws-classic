@@ -100,7 +100,7 @@ export class StatelessStack extends cdk.Stack {
 
     const page = CloudResumeAPI.root.addResource("page");
     page.addMethod("GET");
-    page.addMethod("PUT");
+    page.addMethod("POST");
 
     const pages = CloudResumeAPI.root.addResource("pages");
     pages.addMethod("GET");

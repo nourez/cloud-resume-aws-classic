@@ -11,7 +11,7 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(DYNAMO_TABLE)
 
 get_method = "GET"
-put_method = "PUT"
+post_method = "POST"
 page_path = "/page"
 pages_path = "/pages"
 
@@ -25,7 +25,7 @@ def lambda_handler(event, context):
         if http_method == get_method:
             response = get_hit_count(event["queryStringParameters"]["page"])
             return response
-        elif http_method == put_method:
+        elif http_method == post_method:
             response = increment_hit_count(event["queryStringParameters"]["page"])
             return response
         else:
