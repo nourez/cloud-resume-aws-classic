@@ -9,6 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Test CDK Stacks
-        run: pwd
+        run: npm test
         working-directory: iac
       
