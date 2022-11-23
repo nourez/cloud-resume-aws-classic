@@ -7,6 +7,7 @@ jobs:
   Unit-Tests:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Test CDK Stacks
         run: pwd
         working-directory: iac
