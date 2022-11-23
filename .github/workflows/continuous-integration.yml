@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        run: |
+      - run: |
           npm install -g aws-cdk
           cdk synth --all
         working-directory: iac
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        run: |
+      - run: |
           npm ci
           npm test
         working-directory: iac
