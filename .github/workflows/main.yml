@@ -8,6 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Test CDK Stacks
-        run: npm test
+        run: pwd
         working-directory: iac
       
