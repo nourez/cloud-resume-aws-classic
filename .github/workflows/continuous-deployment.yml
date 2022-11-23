@@ -1,0 +1,18 @@
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install aws-cdk
+      - run: cdk synth --all
+        working-directory: iac
+
+  Deploy:
+    runs-on: ubuntu-latest
+
+  Test:
+    runs-on: ubuntu-latest

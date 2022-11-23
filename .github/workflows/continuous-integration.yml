@@ -1,0 +1,23 @@
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          npm install -g aws-cdk
+          npm ci
+          cdk synth --all
+        working-directory: iac
+
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          npm ci
+          npm test
+        working-directory: iac
