@@ -1,0 +1,13 @@
+on:
+  pull_request:
+  push:
+    branches: "main"
+    
+jobs:
+  Unit-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test CDK Stacks
+        working-directory: ./cdk
+        run: npm test
+      
