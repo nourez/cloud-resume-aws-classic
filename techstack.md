@@ -36,7 +36,7 @@ Full tech stack [here](/techstack.md)
 # Tech Stack File
 ![](https://img.stackshare.io/repo.svg "repo") [nourez/cloud-resume-aws-classic](https://github.com/nourez/cloud-resume-aws-classic)![](https://img.stackshare.io/public_badge.svg "public")
 <br/><br/>
-|16<br/>Tools used|03/02/24 <br/>Report generated|
+|16<br/>Tools used|03/03/24 <br/>Report generated|
 |------|------|
 </div>
 
